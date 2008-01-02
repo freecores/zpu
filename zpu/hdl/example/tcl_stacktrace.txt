@@ -1,0 +1,19 @@
+Sat Aug 04 9:07:47 PM W. Europe Standard Time 2007
+Trace back: 
+    while executing
+"macroMark"
+    (procedure "update" line 5)
+    invoked from within
+"update"
+    (procedure "really_quit" line 41)
+    invoked from within
+"really_quit -f"
+    (procedure "Transcript::QuitDialog" line 6)
+    invoked from within
+"Transcript::QuitDialog"
+    (procedure "quit" line 21)
+    invoked from within
+"quit"
+    (command for "WM_DELETE_WINDOW" window manager protocol)
+  2: ::tkerror {}
+  1: ::bgerror {}
