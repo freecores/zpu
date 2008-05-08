@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="./zpu_doc.css" type="text/css" />
+<title>./html/zpu_doc</title>
+<!-- Source: ./sources/ -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">ZPU DOCUMENTATION</a>
+</div> <!-- logo -->
+<h3>TABLE OF CONTENTS</h3>
+<ul>
+<li>1. <a href="#robo0">ZPU/history</a></li>
+<li>2. <a href="#robo1">ZPU/Zylin documentation</a></li>
+<li>3. <a href="#robo2">ZPU/overview</a></li>
+<li>4. <a href="#robo3">ZPU/development tree</a></li>
+<li>5. <a href="#robo4">ZPU/verilog source browser</a></li>
+<li>6. <a href="#robo5">ZPU/data base</a></li>
+<ul>
+<li>6.1. <a href="#robo6">data base/run demos</a></li>
+</ul>
+</ul>
+<a name="robo0">
+<a name="ZPU2fhistory">
+<h1>1.  ZPU/history [ history ]  </h1>
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ history ]</p>
+<p class="item_name">MODIFICATION HISTORY</p>
+<pre> DATE     WHO   DESCRIPTION
+ -------- ----- --------------------------------------------------------------
+ 07.05.08 JK    initial version
+                verilog verion of the ZPU
+                - basic tool chain for linux
+                  * binutils
+                  * gcc
+                - supported simulators:
+                  * cver     : <a href="http://www.pragmatic-c.com/gpl-cver/">http://www.pragmatic-c.com/gpl-cver/</a>
+                  * veriwell : <a href="http://sourceforge.net/projects/veriwell">http://sourceforge.net/projects/veriwell</a>
+                  * modelsim : <a href="http://www.model.com/resources/resources_demos.asp">http://www.model.com/resources/resources_demos.asp</a>
+
+ -----------------------------------------------------------------------------
+</pre>
+<p class="item_name">AUTHOR</p>
+<pre> jurij kostasenko
+</pre>
+<p class="item_name">SEE ALSO</p>
+<pre> - orig. file:
+   <a href="../readme.txt">../readme.txt</a>
+
+ - eCosForge: sitefor the development of software for the eCos (R)
+              open source real-time operating system.
+   <a href="http://www.ecosforge.net/pmwiki/">http://www.ecosforge.net/pmwiki/</a>
+
+ - ZPU - the worlds smallest 32 bit CPU with GCC toolchain: Overview
+   <a href="http://www.opencores.org/projects.cgi/web/zpu/overview">http://www.opencores.org/projects.cgi/web/zpu/overview</a>
+
+ - ROBODOC: a convenient documentation tool
+   <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">http://www.xs4all.nl/~rfsber/Robo/robodoc.html</a>
+
+ - CVER: GNU General Public License Verilog standard HDL simulator
+   <a href="http://www.pragmatic-c.com/gpl-cver">http://www.pragmatic-c.com/gpl-cver</a>
+
+ - v2html: a free perl script that converts verilog designs into webpages.
+   <a href="http://www.burbleland.com/v2html/v2html.html">http://www.burbleland.com/v2html/v2html.html</a>
+
+ - Veripool: Free Verilog and SystemC Software
+   <a href="http://www.veripool.org">http://www.veripool.org</a>
+</pre>
+<p class="item_name">TODO</p>
+<pre> build gdb
+</pre>
+<a name="robo1">
+<a name="ZPU2fZylin20documentation">
+<h1>2.  ZPU/Zylin documentation [ tool description ]  </h1>
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ tool description ]</p>
+<p class="item_name">SYNOPSIS</p>
+<pre> all refered documents could be found in the CVS repository
+
+  Download
+
+ the simplest way to get the ZPU HDL source and tools is to check it out from CVS:
+
+ cvs -d :pserver:anonymous@cvs.opencores.org:/cvsroot/anonymous co zpu/zpu
+
+ - Introduction to the stack based CPU (ZPU)
+   <a href="../zpu_arch.html">../zpu_arch.html</a>
+
+ - presentations for the zylin CPU (open office )
+   <a href="../zpudemo.odp">../zpudemo.odp</a>
+   <a href="../zpu.odp">../zpu.odp</a>
+</pre>
+<a name="robo2">
+<a name="ZPU2foverview">
+<h1>3.  ZPU/overview [ tool description ]  </h1>
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ tool description ]</p>
+<p class="item_name">SYNOPSIS</p>
+<pre> ZPU is the worlds smallest 32 bit CPU with GCC tool-chain.
+ the original ZPU source is written in VHDL and provided by Øyvind Harboe on the
+ opencores web page.
+
+
+ this document is a brief compilation for the verilog version of the ZPU.
+ this version will enter to the CVS repository managed by Øyvind Harboe.
+
+ tools provided with this development tree are build for x86 Linux architecture.
+ the tool-chain tested on a intel i686 machine running on Scientific Linux 
+ ( 2.6.9-67 GNU/Linux , RED HAT compatible):
+ <a href="http://www.scientificlinux.org/">http://www.scientificlinux.org/</a>
+</pre>
+<a name="robo3">
+<a name="ZPU2fdevelopment20tree">
+<h1>4.  ZPU/development tree [ tool description ]  </h1>
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ tool description ]</p>
+<p class="item_name">SYNOPSIS</p>
+<pre> Directory Structure
+ -------------------
+ [ZPU_CORE]                     : ZPU_CORE directory tree
+   +- /doc                      : documentation for the ZPU
+      +- /hdl_html              : verilog source HTML browser
+      +- /html                  : HTML docu
+      +- /sources               :
+   +- /local_bin                : local tools for simulation and compilation
+   +- /local_etc                : local config files
+   +- /src                      : verilog HDL sources for the verilog ZPU
+   +- /tb                       : TESTBENCH directory tree
+      +- /bin                   : scripts to run the demo simulation
+      +- /hdl                   : verilog HDL testbench sources
+      +- /soft                  : software directory tree
+         +- /include            : C includes
+         +- /src                : C sources
+</pre>
+<a name="robo4">
+<a name="ZPU2fverilog20source20browser">
+<h1>5.  ZPU/verilog source browser [ tool description ]  </h1>
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ tool description ]</p>
+<p class="item_name">SYNOPSIS</p>
+<pre> to browse thru the verilog implementation refer:
+ <a href="../hdl_html/hierarchy.html">../hdl_html/hierarchy.html</a>
+</pre>
+<a name="robo5">
+<a name="ZPU2fdata20base">
+<h1>6.  ZPU/data base [ tool description ]  </h1>
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ tool description ]</p>
+<p class="item_name">SYNOPSIS</p>
+<pre> this is a brief to important files
+
+</pre>
+<b><u>
+<pre> HDL design of the ZPU 
+</pre>
+</b></u>
+<pre> - main verilog source
+   <a href="../../src/zpu_core.v">../../src/zpu_core.v</a>
+
+ - configuration for the ZPU
+   <a href="../../src/incl/zpu_config.v">../../src/incl/zpu_config.v</a>
+
+ - simple testbench for the ZPU (simulation only)
+   <a href="../../tb/hdl/tb_zpu_core.v">../../tb/hdl/tb_zpu_core.v</a>
+
+ - simple dual port memmory model (simulation only)
+   <a href="../../tb/hdl/dualport_ram.v">../../tb/hdl/dualport_ram.v</a>
+
+
+</pre>
+<b><u>
+<pre> C software for a demo application
+</pre>
+</b></u>
+<pre>
+ - simple main programm
+   <a href="../../tb/soft/src/main.c">../../tb/soft/src/main.c</a>
+
+
+</pre>
+<b><u>
+<pre> scripts to build and run a simulation
+</pre>
+</b></u>
+<pre>
+ - main run script for CVER based simulation
+   <a href="../../tb/bin/run_csim.sh">../../tb/bin/run_csim.sh</a>
+
+ - main run script for VERIWELL based simulation
+   <a href="../../tb/bin/run_vwsim.sh">../../tb/bin/run_vwsim.sh</a>
+
+ - main run script for modelsim based simulation
+   <a href="../../tb/bin/run_msim.sh">../../tb/bin/run_msim.sh</a>
+
+ - ZPU software compile script
+   <a href="../../tb/bin/gen_soft.sh">../../tb/bin/gen_soft.sh</a>
+
+ - HDL generation/preperation script (in this version simple copy taks)
+   <a href="../../tb/bin/gen_hdl.sh">../../tb/bin/gen_hdl.sh</a>
+
+ - HDL source compilation with modelsim
+   <a href="../../tb/bin/compile_msim.sh">../../tb/bin/compile_msim.sh</a>
+
+ - simple monitor to see the printf output from the simulation
+   <a href="../../tb/bin/tty_monitor.sh">../../tb/bin/tty_monitor.sh</a>
+</pre>
+<a name="robo6">
+<a name="data20base2frun20demos">
+<h2>6.1.  data base/run demos [ tool description ]  </h2>
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo5">data base</a> ] [ tool description ]</p>
+<p class="item_name">SYNOPSIS</p>
+<pre> to start a CVER demo simulation
+ do as follow::
+</pre>
+<pre class=source>
+<pre> cd ZPU_CORE
+ tb/bin/run_csim.sh
+</pre>
+</pre>
+<pre>
+ to start a VERIWELL demo simulation
+ do as follow::
+</pre>
+<pre class=source>
+<pre> cd ZPU_CORE
+ tb/bin/run_vwsim.sh
+</pre>
+</pre>
+<pre>
+ to start a MODELSIM demo simulation (modelsim should in your PATH variable!)
+ do as follow::
+</pre>
+<pre class=source>
+<pre> cd ZPU_CORE
+ tb/bin/run_msim.sh
+</pre>
+</pre>
+<pre>
+ 
+ file generated
+</pre>
+<table cellspacing=0 border=1><tr><td>
+<b><u>
+<pre> important files generated                                          
+</pre>
+</b></u>
+<pre>  MODELSIM
+  msim/tty_zpu.txt     : printf output file from the MODELSIM simulation
+  msim/transcript      : MODELSIM run log file 
+
+  CVER
+  csim/tty_zpu.txt     : printf output file from the CVER simulation (unfortunately not work properly)
+  csim/verilog.log     : CVER run log file
+
+  VERIWELL
+  vwsim/tty_zpu.txt    : printf output file from the VERIWELL simulation (unfortunately not work properly)
+  vwsim/veriwell.log   : VERIWELL run log file
+
+  SOFTWARE FLOW
+  wk/soft/img/main.dis : disassemble file
+  wk/mem/dpram.mem     : hex dump of the simulation memory
+</pre>
+</td></tr></table>
+<div id="footer">
+<p>Generated from ./sources/ on Wed May 07 2008 19:53:29
+</p>
+</div> <!-- footer -->
+</body>
+</html>

@@ -1,0 +1,201 @@
+######a* robodoc.rc/history *
+# MODIFICATION HISTORY
+# DATE     WHO   DESCRIPTION
+# -------- ----- --------------------------------------------------------------
+# 11.06.07 JK    initial version
+# -----------------------------------------------------------------------------
+# SYNOPSIS
+# robodoc resource file
+#
+# SEE ALSO
+# orig. file:
+# href:/home/soft/share/robodoc/robodoc.rc
+#
+######
+
+######z* robodoc.rc/items *
+# SYNOPSIS
+# this defines the items scanned for in the sources
+# by default robodoc recognizes the following items:
+# SOURCE
+
+items:
+    INTERFACE
+    SYNOPSIS
+    SOURCE
+    DESCRIPTION
+    SUMMARY
+    FUNCTION
+    NAME
+    SYNOPSIS
+    INPUTS
+    OUTPUTS
+    ARGUMENTS
+    OPTIONS
+    PARAMETERS
+    SWITCHES
+    RESULT
+    RETURN VALUE
+    EXAMPLE
+    DIAGNOSTICS
+    WARNINGS
+    ERRORS
+    TODO
+    IDEAS
+    TAGS
+    COMMANDS
+    PORTABILITY
+    SIDE EFFECTS
+    HISTORY
+    MODIFICATION HISTORY
+    BUGS
+    NOTES
+    CREATION DATE
+    SEE ALSO
+    COPYRIGHT
+    REGDEF
+    HDL
+    NOTES
+    PERLSCRIPT
+    AUTHOR
+    USES
+    PITFALL
+
+######
+
+######z* robodoc.rc/accept files *
+# SYNOPSIS
+# this defines the files which will be scanned only
+#
+# SOURCE
+
+
+accept files:
+    *.v
+    *.vh
+    *.doc
+    *.c
+    *.txt
+    *.asm
+    *.s
+    *.conf
+    *.pl
+    *.bash
+    *.sh
+    *.css
+    *.rc
+    *.tcl
+    *.template
+    gen_doc
+    README*
+######
+
+
+header markers:
+    //****
+    /*****
+    //####
+    ######
+
+remark markers:
+    //
+    #
+    *
+end markers:
+    ****
+    //****
+    //####
+    ######
+    # ######
+remark begin markers:
+    /*
+remark end markers:
+    */
+
+######z* robodoc.rc/options *
+# SYNOPSIS
+# this defines options for robodoc call
+#
+# SOURCE
+
+options:
+    --src ./sources
+    --doc ./html/zpu_doc
+    --html
+    --singledoc
+    --sections
+    --tabsize 4
+    --toc
+    --documenttitle "ZPU DOCUMENTATION"
+    --index
+    --nogeneratedwith
+    --cmode
+    --nosort
+######
+
+######z* robodoc.rc/headertypes *
+# SYNOPSIS
+# this defines the headertypes used in documentation
+#
+# the main header marked with a type tag
+# e.g. this chapter
+# z* Project Documentation/header types *
+# ( s. href:../readme.txt )
+# by default robodoc hast contains the following:
+#    c   Header for a class
+#    d   Header for a constant (from define)
+#    f   Header for a function
+#    h   Header for a module in a project
+#    m   Header for a method
+#    s   Header for a structure
+#    t   Header for a types
+#    u   Header for a unittest
+#    v   Header for a variable
+#    *   Generic header for every thing else
+#
+# two characters are given, the first character should be i 
+# and the second can be any of the other characters from the table above.
+# This creates an internal header of the type specified by the second character.
+# They can be used to hide certain headers.
+# They are only extracted if requested.
+#
+# Headers marked internal are by default not included in the generated documentation.
+# If you want to include them use the option --internal. You can also generate 
+# the documentation from only the internal headers with the option --internalonly.
+
+# the single letter defines the following types:
+
+# SOURCE
+
+headertypes:
+    a  "history" robo_header_history
+    v  "system description" robo_header_system
+    w  "firm description" robo_header_firm
+    x  "hardware description" robo_header_hardware
+    y  "software description" robo_header_software
+    z  "tool description" robo_header_tool
+######
+
+######z* robodoc.rc/keywords *
+# SYNOPSIS
+# this defines keywords for highlighting
+
+keywords:
+    parameter
+    input
+    output
+
+######
+
+######z* robodoc.rc/source items *
+# SYNOPSIS
+# this defines additional items marked as source
+
+source items:
+    REGDEF
+    HDL
+
+######
+
+ignore items:
+    TAGS

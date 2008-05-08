@@ -1,0 +1,4 @@
+mkdir -p hdl_html
+cd hdl_html
+
+v2html ../../src/*.v ../../src/incl/*.v ../../tb/hdl/*.v

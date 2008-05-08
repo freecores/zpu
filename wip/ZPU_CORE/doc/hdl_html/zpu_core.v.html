@@ -1,0 +1,774 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<title>../../src/zpu_core.v</title>
+<link rel="Stylesheet" title="v2html stylesheet" media="Screen" href="v2html.css">
+</head>
+<script language="JavaScript" type="text/javascript"><!--
+var agt=navigator.userAgent.toLowerCase(); 
+var is_nav  = ((agt.indexOf('mozilla')!=-1) &&
+(agt.indexOf('spoofer')==-1) &&
+(agt.indexOf('compatible') == -1) &&
+(agt.indexOf('opera')==-1) &&
+(agt.indexOf('webtv')==-1)); 
+var is_major = parseInt(navigator.appVersion); 
+var is_nav4up = (is_nav && (is_major >= 4)); 
+var is_ie     = (agt.indexOf("msie") != -1); 
+var is_ie4up  = (is_ie  && (is_major >= 4)); 
+var is_nav5up = (is_nav && (is_major >= 5));
+var dirSep = (window.location.pathname.indexOf('\\') != -1) ? '\\' : '/' ;
+function setbuttons (wndw) {
+var i;
+var sl=wndw.loc[ wndw.document.forms[0].elements[0].selectedIndex ];
+for (i=0;i<sl.length;i++) {
+if(sl[i]) wndw.document.images[i].src='v2html-b1.gif';
+else      wndw.document.images[i].src='v2html-b2.gif';
+}
+if ( wndw.document.forms[0].elements[0].options[ 
+wndw.document.forms[0].elements[0].selectedIndex ].text != '-') {
+wndw.document.images[i  ].src='v2html-b1.gif';
+wndw.document.images[i+1].src='v2html-b1.gif';
+}
+else {
+wndw.document.images[i  ].src='v2html-b2.gif';
+wndw.document.images[i+1].src='v2html-b2.gif';
+}
+}
+// Unindented and uncommented to save spave - look in v2html for a prettier version
+var disabled=1;
+if (!is_nav4up) {
+var event=false; 
+}
+var last_link=0;     
+var last_class=null; 
+function qs(e,t,extra_info_index) {
+var inc=0,bnum=0,i,j;
+if (disabled) return false;
+var sig_buttons = [ "Definition" , "Local Driver" , 
+"Up to Input Driver" , "Find Source" , "Index"];
+if (is_nav4up || is_ie4up) {
+if (((e.which==2) && (!(e.modifiers&Event.SHIFT_MASK))) ||
+((e.which==1) &&  (e.modifiers&Event.CONTROL_MASK)))   inc = 1;
+else if (((e.which==2) && (e.modifiers&Event.SHIFT_MASK)) ||
+((e.which==1) && (e.modifiers&Event.SHIFT_MASK))) inc = -1;
+if (inc == 0 && extra_info_index == 0) { 
+return true;  
+}
+var linkText = is_nav4up ? t.text : t.innerText;
+var linkY    = is_nav4up && ! is_nav5up ? t.y    : t.offsetTop;
+window.status="Searching...";
+if ((last_link==-1) || (document.links[last_link]!=t)) 
+for (last_link=0;last_link<document.links.length;last_link++) 
+if (document.links[last_link] == t)  
+break;
+if (inc != 0) { 
+return search(linkText,linkY,last_link,inc,1);
+}
+else { 
+window.status="";
+extra_info_index--; 
+if (extra_info[extra_info_index][0] != 'S') { 
+return true;
+}
+var w = window.open('','SignalPopUp','width=200,height=235');
+if (null != w.document.forms[0]) {
+if ((window.location.pathname.substring(0,window.location.pathname.lastIndexOf(dirSep)))!=
+(w.pn.substring(0,w.pn.lastIndexOf(dirSep)))) {
+w.close();
+w = window.open('','SignalPopUp','width=200,height=235');
+}
+}
+w.focus(); 
+if (null == w.document.forms[0]) { 
+var Text = '<html><head></head>';
+if (is_nav4up) { 
+w.loc = new Array(10);
+w.sel = null;
+w.pn  = window.location.pathname;
+}
+else {     
+Text += '<script>var loc = new Array(10);<\/script>\n';
+Text += '<script>var sel;<\/script>\n';
+Text += '<script>var pn = opener.location.pathname;<\/script>\n';
+}
+Text += '<body bgcolor="white">\n';
+Text += '<form>';
+Text += '  <select onchange="opener.setbuttons(window);">\n';
+Text += '  <option>---------------------------</option>\n';
+for (j=0;j<9;j++) Text += '  <option>-</option>\n';
+Text += '  </select>\n';
+Text += '</form>';
+Text += '<table cellspacing=0 cellpadding=0>\n';
+for (var i=0;i<(extra_info[extra_info_index].length-1);i++) {
+Text += hbutton(sig_buttons[i], 
+'opener.location=loc[sel.selectedIndex]['+i+'];',
+bnum++);
+}
+Text += hbutton("Search Backwards", 
+'opener.search(sel.options[ sel.selectedIndex ].text,' +
+'0,opener.last_link,-1,0);',bnum++);
+Text += hbutton("Search Forwards",
+'opener.search(sel.options[ sel.selectedIndex ].text,' +
+'0,opener.last_link, 1,0);',bnum++);
+Text += hbutton("Close","window.close();",bnum++);
+Text += '</table>\n';
+Text += '</body></html>\n';
+w.document.open();
+w.document.write(Text);
+w.document.close();
+w.document.forms[0].elements[0].options[0].text  = linkText;
+w.sel = w.document.forms[0].elements[0]; 
+for (j=0;j<10;j++) w.loc[j] = new Array(sig_buttons.length);  
+copy_into_loc0(w,extra_info_index);
+}
+else {
+var opts = w.document.forms[0].elements[0].options;
+if ( opts.length<10 ) { 
+w.loc[opts.length] = new Array;
+opts.length++; 
+}
+for (i=opts.length-2;i>=0;i--) {
+opts[i+1].text=opts[i].text;
+for (var j=0;j<w.loc[i].length;j++) w.loc[i+1][j] = w.loc[i][j];
+}
+opts[0].text  = linkText;
+copy_into_loc0(w,extra_info_index);
+}
+return false; 
+}
+}
+return true;
+}
+function hbutton (text,action,bnum) {
+return '  <tr><td><a href="" '+
+'onmousedown="'+
+'if (images['+bnum+'].src.match(/v2html-b2.gif/)) return false; ' +
+'images['+bnum+'].src=\'v2html-b3.gif\';" '+
+'onmouseup="'+
+'if (images['+bnum+'].src.match(/v2html-b2.gif/)) return false; ' +
+'images['+bnum+'].src=\'v2html-b1.gif\';" '+
+'onclick="'+
+'if (images['+bnum+'].src.match(/v2html-b2.gif/)) return false; ' +
+action + 
+' return false;">'+
+'<img border=0 src="v2html-b1.gif"></a></td>' +
+'<td style="font-family:sans-serif; font-weight:bold; font-size:14px;"> '+text+'</td></tr>\n';
+}
+function copy_into_loc0 (w,extra_info_index) {
+for (var i=1;i<extra_info[extra_info_index].length;i++) {
+w.loc[0][i-1] = extra_info[extra_info_index][i];
+}
+w.document.forms[0].elements[0].selectedIndex=1;
+w.document.forms[0].elements[0].selectedIndex=0;
+setbuttons(w);
+}
+function search(text,y,i,inc,relative) {
+var nextpage,wrappage,linkText,linkY;
+window.status="Searching...";
+if (last_class) document.links[i].className=last_class;
+while (1) {
+for (i+=inc;i<document.links.length && i>=0;i+=inc) {
+linkText = is_nav4up ? document.links[i].text : document.links[i].innerText;
+linkY    = is_nav4up && ! is_nav5up ? document.links[i].y    : document.links[i].offsetTop;
+if ((linkText == text) && (linkY != y)) {
+window.status="";
+if (is_nav4up) 
+if (relative) window.scrollBy(0,linkY - y);
+else          window.scrollTo(0,linkY); 
+else if (is_ie4up)
+document.links[i].scrollIntoView(true); 
+last_link=i;
+last_class=document.links[i].className;
+document.links[i].className='HI';
+return false;
+}
+}
+nextpage = (inc==1) ? next_page() : prev_page();
+wrappage = (inc==1) ? first_page() : last_page();
+if (nextpage!="" || wrappage!="") {
+if (nextpage=="") { 
+if (!confirm(text + " not found. Search again from "+((inc==1)?"first":"last")+" page?"))
+return false;
+nextpage=wrappage;
+}
+location=nextpage+ "?" + escape(text) + "&" + ( y - window.pageYOffset ) + "&" + inc;
+return false;
+}
+if (confirm(text + " not found. Search again from "+((inc==1)?"start":"end")+"?")) {
+if (inc==1) i=-1;
+else i=document.links.length;
+} else return false;
+}
+return true;
+}
+function loadqs() {
+var opt=location.search, text="", s="", y=0, si=0, inc=1;
+if (opt.length==0) return true;  
+for (var i=1;i<opt.length;i++) { 
+if (opt.charAt(i) != "&") 
+s += opt.charAt(i);
+else {
+if (text=="") text=unescape(s);
+else             y=s;
+s="";
+}
+}
+if (text=="") return true;
+if (s == "-1") { si=document.links.length-1; inc=-1; }
+window.scrollTo(0,0);
+search(text,y,si,inc);
+return true;
+}
+// -->
+</script>
+<body onload='loadqs();'>
+<script language="JavaScript"type="text/javascript"><!--
+function prev_page() { return ""; }
+function last_page() { return ""; }
+// -->
+</script>
+<center><table class=NB cols=7 ><tr><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy.html';"><a target="_top" href="hierarchy.html">Hierarchy</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-f.html';"><a target="_top" href="hierarchy-f.html">Files</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-m.html';"><a target="_top" href="hierarchy-m.html">Modules</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-s.html';"><a target="_top" href="hierarchy-s.html">Signals</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-t.html';"><a target="_top" href="hierarchy-t.html">Tasks</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-fn.html';"><a target="_top" href="hierarchy-fn.html">Functions</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='http://www.burbleland.com/v2html/help_7_30.html?';"><a target="_top" href="http://www.burbleland.com/v2html/help_7_30.html?">Help</a></td></tr></table></center>
+<pre>
+<span class=C>// NOTES
+</span><span class=C>// verilog version of the ZPU CORE (small)
+</span><span class=C>//
+</span><span class=C>// ZPU CORE translated from zpu_core.vhd
+</span><span class=C>// original signal and register names are preserved -&gt; resp. names are unified!
+</span><span class=C>// (do not mix upper and lower case signal names, because verilog is case sensitive!!!)
+</span><span class=C>//
+</span><span class=C>// the CVS repository is managed by Øyvind Harboe
+</span><span class=C>//
+</span><span class=C>// SEE ALSO
+</span><span class=C>// - org. repository
+</span><span class=C>// <a CLASS=C href="http://www.opencores.org/projects.cgi/web/zpu/overview">http://www.opencores.org/projects.cgi/web/zpu/overview</a>
+</span><span class=C>//
+</span><span class=C>// - ecos for the ZPU
+</span><span class=C>// <a CLASS=C href="http://www.ecosforge.net/pmwiki/">http://www.ecosforge.net/pmwiki/</a>
+</span><span class=C>//
+</span><span class=C>// AUTHOR
+</span><span class=C>// Jurij Kostasenko
+</span>
+<a name="zpu_core"></a><a  href="tb_zpu_core.v.html#tb_zpu_core_zpu_core_i"><img alt="[Up: tb_zpu_core zpu_core_i]" align=bottom border=0 src="v2html-up.gif"></a>
+<span class=K>module</span> <span class=MM>zpu_core</span><a  href="hierarchy-m.html#zpu_core"><img align=top border=0 alt="Index" src="v2html-i.gif"></a> (
+	<a  onClick="return qs(event,this,1)"  class=SI href="#37">clk</a>,
+	<a  onClick="return qs(event,this,2)"  class=SI href="#38">areset</a>,
+	<a  onClick="return qs(event,this,3)"  class=SI href="#39">enable</a>,
+	<a  onClick="return qs(event,this,4)"  class=SI href="#40">in_mem_busy</a>,
+	<a  onClick="return qs(event,this,5)"  class=SI href="#41">mem_read</a>,
+	<a  onClick="return qs(event,this,6)"  class=SOR href="#42">mem_write</a>,
+	<a  onClick="return qs(event,this,7)"  class=SOR href="#44">out_mem_addr</a>,
+	<a  onClick="return qs(event,this,8)"  class=SOR href="#46">out_mem_writeEnable</a>,
+	<a  onClick="return qs(event,this,9)"  class=SOR href="#48">out_mem_readEnable</a>,
+	<a  onClick="return qs(event,this,10)"  class=SO href="#50">mem_writeMask</a>,
+	<a  onClick="return qs(event,this,11)"  class=SI href="#52">interrupt</a>,
+	<a  onClick="return qs(event,this,12)"  class=SOR href="#53">break</a>
+);
+
+<span class=M>`include</span> <a  onClick="return qs(event,this,0)"  class=S href="zpu_config.v.html">&quot;zpu_config.v&quot;</a>
+
+<a name="37"></a><span class=K>input</span>                      <a  onClick="return qs(event,this,1)"  class=SI href="tb_zpu_core.v.html#185">clk</a>;
+<a name="38"></a><span class=K>input</span>                      <a  onClick="return qs(event,this,2)"  class=SI href="tb_zpu_core.v.html#186">areset</a>;
+<a name="39"></a><span class=K>input</span>                      <a  onClick="return qs(event,this,3)"  class=SI href="tb_zpu_core.v.html#187">enable</a>;
+<a name="40"></a><span class=K>input</span>                      <a  onClick="return qs(event,this,4)"  class=SI href="tb_zpu_core.v.html#188">in_mem_busy</a>;
+<a name="41"></a><span class=K>input</span>       [wordSize-1:0] <a  onClick="return qs(event,this,5)"  class=SI href="tb_zpu_core.v.html#189">mem_read</a>;
+<a name="42"></a><span class=K>output</span>      [wordSize-1:0] <a  onClick="return qs(event,this,6)"  class=SOR href="#203">mem_write</a>;
+<span class=K>reg</span>         [wordSize-1:0] <a  onClick="return qs(event,this,6)"  class=SOR href="#42">mem_write</a>;
+<a name="44"></a><span class=K>output</span> [maxaddrbitincio:0] <a  onClick="return qs(event,this,7)"  class=SOR href="#202">out_mem_addr</a>;
+<span class=K>reg</span>    [maxaddrbitincio:0] <a  onClick="return qs(event,this,7)"  class=SOR href="#44">out_mem_addr</a>;
+<a name="46"></a><span class=K>output</span>                     <a  onClick="return qs(event,this,8)"  class=SOR href="#183">out_mem_writeEnable</a>;
+<span class=K>reg</span>                        <a  onClick="return qs(event,this,8)"  class=SOR href="#46">out_mem_writeEnable</a>;
+<a name="48"></a><span class=K>output</span>                     <a  onClick="return qs(event,this,9)"  class=SOR href="#184">out_mem_readEnable</a>;
+<span class=K>reg</span>                        <a  onClick="return qs(event,this,9)"  class=SOR href="#48">out_mem_readEnable</a>;
+<a name="50"></a><span class=K>output</span>     [wordBytes-1:0] <a  onClick="return qs(event,this,10)"  class=SO href="#127">mem_writeMask</a>;
+<span class=K>wire</span>       [wordBytes-1:0] <a  onClick="return qs(event,this,10)"  class=SO href="#50">mem_writeMask</a>;
+<a name="52"></a><span class=K>input</span>                      <a  onClick="return qs(event,this,11)"  class=SI href="#52">interrupt</a>;              <span class=C>// not used in this design
+</span><a name="53"></a><span class=K>output</span>                     <a  onClick="return qs(event,this,12)"  class=SOR href="#174">break</a>;                  <span class=C>// indicate a ZPU break instruction
+</span><span class=K>reg</span>                        <a  onClick="return qs(event,this,12)"  class=SOR href="#53">break</a>;
+
+<a name="56"></a><span class=K>wire</span> <a  onClick="return qs(event,this,13)"  class=SW href="#56">readIO</a>;
+<a name="57"></a><span class=K>reg</span>                          <a  onClick="return qs(event,this,14)"  class=SR href="#181">memAWriteEnable</a>;
+<a name="58"></a><span class=K>reg</span>  [maxAddrBit:minAddrBit] <a  onClick="return qs(event,this,15)"  class=SR href="#179">memAAddr</a>;
+<a name="59"></a><span class=K>reg</span>           [wordSize-1:0] <a  onClick="return qs(event,this,16)"  class=SR href="#185">memAWrite</a>;
+<a name="60"></a><span class=K>wire</span>          [wordSize-1:0] <a  onClick="return qs(event,this,17)"  class=SW href="#474">memARead</a>;
+<a name="61"></a><span class=K>reg</span>                          <a  onClick="return qs(event,this,18)"  class=SR href="#182">memBWriteEnable</a>;
+<a name="62"></a><span class=K>reg</span>  [maxAddrBit:minAddrBit] <a  onClick="return qs(event,this,19)"  class=SR href="#180">memBAddr</a>;
+<a name="63"></a><span class=K>reg</span>           [wordSize-1:0] <a  onClick="return qs(event,this,20)"  class=SR href="#186">memBWrite</a>;
+<a name="64"></a><span class=K>wire</span>          [wordSize-1:0] <a  onClick="return qs(event,this,21)"  class=SW href="#478">memBRead</a>;
+<a name="65"></a><span class=K>reg</span>           [maxAddrBit:0] <a  onClick="return qs(event,this,22)"  class=SR href="#176">pc</a>;
+<a name="66"></a><span class=K>reg</span>  [maxAddrBit:minAddrBit] <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a>;
+<a name="67"></a><span class=K>reg</span>                          <a  onClick="return qs(event,this,24)"  class=SR href="#177">idim_flag</a>;
+
+<a name="69"></a><span class=K>wire</span> <a  onClick="return qs(event,this,25)"  class=SW href="#69">busy</a>;
+
+<a name="71"></a><span class=K>reg</span>                              <a  onClick="return qs(event,this,26)"  class=SR href="#178">begin_inst</a>;
+<a name="72"></a><span class=K>reg</span>                        [7:0] <a  onClick="return qs(event,this,27)"  class=SR href="#218">trace_opcode</a>;
+<a name="73"></a><span class=K>reg</span>          [maxaddrbitincio:0] <a  onClick="return qs(event,this,28)"  class=SR href="#216">trace_pc</a>;
+<a name="74"></a><span class=K>reg</span> [maxaddrbitincio:minAddrBit] <a  onClick="return qs(event,this,29)"  class=SR href="#219">trace_sp</a>;
+<a name="75"></a><span class=K>reg</span>               [wordSize-1:0] <a  onClick="return qs(event,this,30)"  class=SR href="#221">trace_topOfStack</a>;
+<a name="76"></a><span class=K>reg</span>               [wordSize-1:0] <a  onClick="return qs(event,this,31)"  class=SR href="#222">trace_topOfStackB</a>;
+
+<span class=C>// state machine fix coding
+</span><a name="79"></a><span class=K>parameter</span> [3:0] <a  onClick="return qs(event,this,0)"  class=PA href="#79">State_Fetch</a>        = 0;
+<a name="80"></a><span class=K>parameter</span> [3:0] <a  onClick="return qs(event,this,0)"  class=PA href="#80">State_WriteIODone</a>  = 1;
+<a name="81"></a><span class=K>parameter</span> [3:0] <a  onClick="return qs(event,this,0)"  class=PA href="#81">State_Execute</a>      = 2;
+<a name="82"></a><span class=K>parameter</span> [3:0] <a  onClick="return qs(event,this,0)"  class=PA href="#82">State_StoreToStack</a> = 3;
+<a name="83"></a><span class=K>parameter</span> [3:0] <a  onClick="return qs(event,this,0)"  class=PA href="#83">State_Add</a>          = 4;
+<a name="84"></a><span class=K>parameter</span> [3:0] <a  onClick="return qs(event,this,0)"  class=PA href="#84">State_Or</a>           = 5;
+<a name="85"></a><span class=K>parameter</span> [3:0] <a  onClick="return qs(event,this,0)"  class=PA href="#85">State_And</a>          = 6;
+<a name="86"></a><span class=K>parameter</span> [3:0] <a  onClick="return qs(event,this,0)"  class=PA href="#86">State_Store</a>        = 7;
+<a name="87"></a><span class=K>parameter</span> [3:0] <a  onClick="return qs(event,this,0)"  class=PA href="#87">State_ReadIO</a>       = 8;
+<a name="88"></a><span class=K>parameter</span> [3:0] <a  onClick="return qs(event,this,0)"  class=PA href="#88">State_WriteIO</a>      = 9;
+<a name="89"></a><span class=K>parameter</span> [3:0] <a  onClick="return qs(event,this,0)"  class=PA href="#89">State_Load</a>         = 10;
+<a name="90"></a><span class=K>parameter</span> [3:0] <a  onClick="return qs(event,this,0)"  class=PA href="#90">State_FetchNext</a>    = 11;
+<a name="91"></a><span class=K>parameter</span> [3:0] <a  onClick="return qs(event,this,0)"  class=PA href="#91">State_AddSP</a>        = 12;
+<a name="92"></a><span class=K>parameter</span> [3:0] <a  onClick="return qs(event,this,0)"  class=PA href="#92">State_ReadIODone</a>   = 13;
+<a name="93"></a><span class=K>parameter</span> [3:0] <a  onClick="return qs(event,this,0)"  class=PA href="#93">State_Decode</a>       = 14;
+<a name="94"></a><span class=K>parameter</span> [3:0] <a  onClick="return qs(event,this,0)"  class=PA href="#94">State_Resync</a>       = 15;
+
+<span class=C>// DecodedOpcodeType fix coding
+</span><a name="97"></a><span class=K>parameter</span> [4:0] <a  onClick="return qs(event,this,0)"  class=PA href="#97">Decoded_Nop</a>        = 0;
+<a name="98"></a><span class=K>parameter</span> [4:0] <a  onClick="return qs(event,this,0)"  class=PA href="#98">Decoded_Im</a>         = 1;
+<a name="99"></a><span class=K>parameter</span> [4:0] <a  onClick="return qs(event,this,0)"  class=PA href="#99">Decoded_ImShift</a>    = 2;
+<a name="100"></a><span class=K>parameter</span> [4:0] <a  onClick="return qs(event,this,0)"  class=PA href="#100">Decoded_LoadSP</a>     = 3;
+<a name="101"></a><span class=K>parameter</span> [4:0] <a  onClick="return qs(event,this,0)"  class=PA href="#101">Decoded_StoreSP</a>    = 4;
+<a name="102"></a><span class=K>parameter</span> [4:0] <a  onClick="return qs(event,this,0)"  class=PA href="#102">Decoded_AddSP</a>      = 5;
+<a name="103"></a><span class=K>parameter</span> [4:0] <a  onClick="return qs(event,this,0)"  class=PA href="#103">Decoded_Emulate</a>    = 6;
+<a name="104"></a><span class=K>parameter</span> [4:0] <a  onClick="return qs(event,this,0)"  class=PA href="#104">Decoded_Break</a>      = 7;
+<a name="105"></a><span class=K>parameter</span> [4:0] <a  onClick="return qs(event,this,0)"  class=PA href="#105">Decoded_PushSP</a>     = 8;
+<a name="106"></a><span class=K>parameter</span> [4:0] <a  onClick="return qs(event,this,0)"  class=PA href="#106">Decoded_PopPC</a>      = 9;
+<a name="107"></a><span class=K>parameter</span> [4:0] <a  onClick="return qs(event,this,0)"  class=PA href="#107">Decoded_Add</a>        = 10;
+<a name="108"></a><span class=K>parameter</span> [4:0] <a  onClick="return qs(event,this,0)"  class=PA href="#108">Decoded_Or</a>         = 11;
+<a name="109"></a><span class=K>parameter</span> [4:0] <a  onClick="return qs(event,this,0)"  class=PA href="#109">Decoded_And</a>        = 12;
+<a name="110"></a><span class=K>parameter</span> [4:0] <a  onClick="return qs(event,this,0)"  class=PA href="#110">Decoded_Load</a>       = 13;
+<a name="111"></a><span class=K>parameter</span> [4:0] <a  onClick="return qs(event,this,0)"  class=PA href="#111">Decoded_Not</a>        = 14;
+<a name="112"></a><span class=K>parameter</span> [4:0] <a  onClick="return qs(event,this,0)"  class=PA href="#112">Decoded_Flip</a>       = 15;
+<a name="113"></a><span class=K>parameter</span> [4:0] <a  onClick="return qs(event,this,0)"  class=PA href="#113">Decoded_Store</a>      = 16;
+<a name="114"></a><span class=K>parameter</span> [4:0] <a  onClick="return qs(event,this,0)"  class=PA href="#114">Decoded_PopSP</a>      = 17;
+
+<a name="116"></a><span class=K>reg</span>  [OpCode_Size-1:0] <a  onClick="return qs(event,this,32)"  class=SR href="#141">sampledOpcode</a>;
+<a name="117"></a><span class=K>reg</span>  [OpCode_Size-1:0] <a  onClick="return qs(event,this,33)"  class=SR href="#205">opcode</a>;
+<a name="118"></a><span class=K>reg</span>              [4:0] <a  onClick="return qs(event,this,34)"  class=SR href="#204">decodedOpcode</a>;
+<a name="119"></a><span class=K>reg</span>              [4:0] <a  onClick="return qs(event,this,35)"  class=SR href="#142">sampledDecodedOpcode</a>;
+
+<span class=C>// state vector
+</span><a name="122"></a><span class=K>reg</span>              [3:0] <a  onClick="return qs(event,this,36)"  class=SR href="#173">state</a>;
+
+
+<a name="125"></a><span class=K>wire</span> [4:0] <a  onClick="return qs(event,this,37)"  class=SW href="#128">tOpcode_sel</a>;
+
+<a name="127"></a><span class=K>assign</span> <a  onClick="return qs(event,this,10)"  class=SO href="#50">mem_writeMask</a>      = {wordBytes{1'b1}}; <span class=C>// Replicate 1'b1 (wordBytes)-times
+</span><a name="128"></a><span class=K>assign</span> <a  onClick="return qs(event,this,37)"  class=SW href="#125">tOpcode_sel</a> = <a  onClick="return qs(event,this,22)"  class=SR href="#176">pc</a>[minAddrBit - 1:0];
+
+<span class=C>// decoding the ZPU opcode
+</span><span class=K>always</span> @(<a  onClick="return qs(event,this,21)"  class=SW href="#64">memBRead</a> <span class=K>or</span> <a  onClick="return qs(event,this,22)"  class=SR href="#65">pc</a> <span class=K>or</span> <a  onClick="return qs(event,this,37)"  class=SW href="#125">tOpcode_sel</a>)
+<span class=K>begin</span> : decodeControl
+	<span class=K>reg</span>[OpCode_Size - 1:0] tOpcode;
+	<span class=K>case</span> (<a  onClick="return qs(event,this,37)"  class=SW href="#125">tOpcode_sel</a>)
+		0 : tOpcode = <a  onClick="return qs(event,this,21)"  class=SW href="#478">memBRead</a>[31:24];
+		1 : tOpcode = <a  onClick="return qs(event,this,21)"  class=SW href="#478">memBRead</a>[23:16];
+		2 : tOpcode = <a  onClick="return qs(event,this,21)"  class=SW href="#478">memBRead</a>[15:8];
+		3 : tOpcode = <a  onClick="return qs(event,this,21)"  class=SW href="#478">memBRead</a>[7:0];
+		<span class=K>default</span> : tOpcode = <a  onClick="return qs(event,this,21)"  class=SW href="#478">memBRead</a>[7:0];
+	<span class=K>endcase</span>
+<a name="141"></a>	<a  onClick="return qs(event,this,32)"  class=SR href="#116">sampledOpcode</a> &lt;= tOpcode ;
+<a name="142"></a>	<span class=K>if</span> ((tOpcode[7:7]) == OpCode_Im)         <a  onClick="return qs(event,this,35)"  class=SR href="#119">sampledDecodedOpcode</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#98">Decoded_Im</a> ;
+	<span class=K>else</span> <span class=K>if</span> (tOpcode[7:5] == OpCode_StoreSP) <a  onClick="return qs(event,this,35)"  class=SR href="#119">sampledDecodedOpcode</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#101">Decoded_StoreSP</a> ;
+	<span class=K>else</span> <span class=K>if</span> (tOpcode[7:5] == OpCode_LoadSP)  <a  onClick="return qs(event,this,35)"  class=SR href="#119">sampledDecodedOpcode</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#100">Decoded_LoadSP</a> ;
+	<span class=K>else</span> <span class=K>if</span> (tOpcode[7:5] == OpCode_Emulate) <a  onClick="return qs(event,this,35)"  class=SR href="#119">sampledDecodedOpcode</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#103">Decoded_Emulate</a> ;
+	<span class=K>else</span> <span class=K>if</span> (tOpcode[7:4] == OpCode_AddSP)   <a  onClick="return qs(event,this,35)"  class=SR href="#119">sampledDecodedOpcode</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#102">Decoded_AddSP</a> ;
+	<span class=K>else</span>
+	<span class=K>begin</span>
+		<span class=K>case</span> (tOpcode[3:0])
+			OpCode_Break : <a  onClick="return qs(event,this,35)"  class=SR href="#119">sampledDecodedOpcode</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#104">Decoded_Break</a>;
+			OpCode_PushSP: <a  onClick="return qs(event,this,35)"  class=SR href="#119">sampledDecodedOpcode</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#105">Decoded_PushSP</a>;
+			OpCode_PopPC : <a  onClick="return qs(event,this,35)"  class=SR href="#119">sampledDecodedOpcode</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#106">Decoded_PopPC</a>;
+			OpCode_Add   : <a  onClick="return qs(event,this,35)"  class=SR href="#119">sampledDecodedOpcode</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#107">Decoded_Add</a>;
+			OpCode_Or    : <a  onClick="return qs(event,this,35)"  class=SR href="#119">sampledDecodedOpcode</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#108">Decoded_Or</a>;
+			OpCode_And   : <a  onClick="return qs(event,this,35)"  class=SR href="#119">sampledDecodedOpcode</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#109">Decoded_And</a>;
+			OpCode_Load  : <a  onClick="return qs(event,this,35)"  class=SR href="#119">sampledDecodedOpcode</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#110">Decoded_Load</a>;
+			OpCode_Not   : <a  onClick="return qs(event,this,35)"  class=SR href="#119">sampledDecodedOpcode</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#111">Decoded_Not</a>;
+			OpCode_Flip  : <a  onClick="return qs(event,this,35)"  class=SR href="#119">sampledDecodedOpcode</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#112">Decoded_Flip</a>;
+			OpCode_Store : <a  onClick="return qs(event,this,35)"  class=SR href="#119">sampledDecodedOpcode</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#113">Decoded_Store</a>;
+			OpCode_PopSP : <a  onClick="return qs(event,this,35)"  class=SR href="#119">sampledDecodedOpcode</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#114">Decoded_PopSP</a>;
+			<span class=K>default</span>      : <a  onClick="return qs(event,this,35)"  class=SR href="#119">sampledDecodedOpcode</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#97">Decoded_Nop</a>;
+		<span class=K>endcase</span>
+	<span class=K>end</span>
+<span class=K>end</span>
+
+<span class=C>// main ZPU controller
+</span><span class=K>always</span> @(<span class=K>posedge</span> <a  onClick="return qs(event,this,1)"  class=SI href="#37">clk</a> <span class=K>or</span> <span class=K>posedge</span> <a  onClick="return qs(event,this,2)"  class=SI href="#38">areset</a>)
+<span class=K>begin</span> : opcodeControl
+	<span class=C>// local variable
+</span>	<span class=K>reg</span> [4:0] spOffset;
+	<span class=K>if</span> (<a  onClick="return qs(event,this,2)"  class=SI href="#38">areset</a> == 1'b1)
+	<span class=K>begin</span>
+<a name="173"></a>		<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a>               &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#94">State_Resync</a>;
+<a name="174"></a>		<a  onClick="return qs(event,this,12)"  class=SOR href="#53">break</a>               &lt;= 1'b0;
+<a name="175"></a>		<a  onClick="return qs(event,this,23)"  class=SR href="#66">sp</a>                  &lt;= spstart[maxAddrBit:minAddrBit];
+<a name="176"></a>		<a  onClick="return qs(event,this,22)"  class=SR href="#65">pc</a>                  &lt;= 'h0;
+<a name="177"></a>		<a  onClick="return qs(event,this,24)"  class=SR href="#67">idim_flag</a>           &lt;= 1'b0;
+<a name="178"></a>		<a  onClick="return qs(event,this,26)"  class=SR href="#71">begin_inst</a>          &lt;= 1'b0;
+<a name="179"></a>		<a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a>            &lt;= 'h0;
+<a name="180"></a>		<a  onClick="return qs(event,this,19)"  class=SR href="#62">memBAddr</a>            &lt;= 'h0;
+<a name="181"></a>		<a  onClick="return qs(event,this,14)"  class=SR href="#57">memAWriteEnable</a>     &lt;= 1'b0;
+<a name="182"></a>		<a  onClick="return qs(event,this,18)"  class=SR href="#61">memBWriteEnable</a>     &lt;= 1'b0;
+<a name="183"></a>		<a  onClick="return qs(event,this,8)"  class=SOR href="#46">out_mem_writeEnable</a> &lt;= 1'b0;
+<a name="184"></a>		<a  onClick="return qs(event,this,9)"  class=SOR href="#48">out_mem_readEnable</a>  &lt;= 1'b0;
+<a name="185"></a>		<a  onClick="return qs(event,this,16)"  class=SR href="#59">memAWrite</a>           &lt;= 'h0;
+<a name="186"></a>		<a  onClick="return qs(event,this,20)"  class=SR href="#63">memBWrite</a>           &lt;= 'h0;
+	<span class=K>end</span>
+	<span class=C>// avoid Latch in synopsys
+</span>	<span class=C>// mem_writeMask &lt;= (others =&gt; '1');
+</span>	<span class=K>else</span>
+	<span class=K>begin</span>
+		<a  onClick="return qs(event,this,14)"  class=SR href="#57">memAWriteEnable</a> &lt;= 1'b0;
+		<a  onClick="return qs(event,this,18)"  class=SR href="#61">memBWriteEnable</a> &lt;= 1'b0;
+		<a  onClick="return qs(event,this,16)"  class=SR href="#59">memAWrite</a> &lt;= 'h0;
+		<a  onClick="return qs(event,this,20)"  class=SR href="#63">memBWrite</a> &lt;= 'h0;
+		spOffset = 'h0;
+		<a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a> &lt;= 'h0;
+		<a  onClick="return qs(event,this,19)"  class=SR href="#62">memBAddr</a> &lt;= 'h0;
+		<a  onClick="return qs(event,this,8)"  class=SOR href="#46">out_mem_writeEnable</a> &lt;= 1'b0;
+		<a  onClick="return qs(event,this,9)"  class=SOR href="#48">out_mem_readEnable</a> &lt;= 1'b0;
+		<a  onClick="return qs(event,this,26)"  class=SR href="#71">begin_inst</a> &lt;= 1'b0;
+<a name="202"></a>		<a  onClick="return qs(event,this,7)"  class=SOR href="#44">out_mem_addr</a> &lt;= <a  onClick="return qs(event,this,17)"  class=SW href="#474">memARead</a>[maxaddrbitincio:0];
+<a name="203"></a>		<a  onClick="return qs(event,this,6)"  class=SOR href="#42">mem_write</a> &lt;= <a  onClick="return qs(event,this,21)"  class=SW href="#478">memBRead</a>;
+<a name="204"></a>		<a  onClick="return qs(event,this,34)"  class=SR href="#118">decodedOpcode</a> &lt;= <a  onClick="return qs(event,this,35)"  class=SR href="#142">sampledDecodedOpcode</a>;
+<a name="205"></a>		<a  onClick="return qs(event,this,33)"  class=SR href="#117">opcode</a> &lt;= <a  onClick="return qs(event,this,32)"  class=SR href="#141">sampledOpcode</a>;
+		<span class=K>case</span> (<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a>)
+			<a  onClick="return qs(event,this,0)"  class=PA href="#81">State_Execute</a> :
+				<span class=K>begin</span>
+					<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a>                           &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#79">State_Fetch</a>;
+					<span class=C>// at this point:
+</span>					<span class=C>// memBRead contains opcode word
+</span>					<span class=C>// memARead contains top of stack
+</span>					<a  onClick="return qs(event,this,22)"  class=SR href="#65">pc</a>                              &lt;= <a  onClick="return qs(event,this,22)"  class=SR href="#176">pc</a> + 1;
+					<span class=C>// trace
+</span>					<a  onClick="return qs(event,this,26)"  class=SR href="#71">begin_inst</a>                      &lt;= 1'b1;
+<a name="216"></a>					<a  onClick="return qs(event,this,28)"  class=SR href="#73">trace_pc</a>                        &lt;= 'h0;
+					<a  onClick="return qs(event,this,28)"  class=SR href="#73">trace_pc</a>[maxAddrBit:0]          &lt;= <a  onClick="return qs(event,this,22)"  class=SR href="#176">pc</a>;
+<a name="218"></a>					<a  onClick="return qs(event,this,27)"  class=SR href="#72">trace_opcode</a>                    &lt;= <a  onClick="return qs(event,this,33)"  class=SR href="#205">opcode</a>;
+<a name="219"></a>					<a  onClick="return qs(event,this,29)"  class=SR href="#74">trace_sp</a>                        &lt;= 'h0;
+					<a  onClick="return qs(event,this,29)"  class=SR href="#74">trace_sp</a>[maxAddrBit:minAddrBit] &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a>;
+<a name="221"></a>					<a  onClick="return qs(event,this,30)"  class=SR href="#75">trace_topOfStack</a>                &lt;= <a  onClick="return qs(event,this,17)"  class=SW href="#474">memARead</a>;
+<a name="222"></a>					<a  onClick="return qs(event,this,31)"  class=SR href="#76">trace_topOfStackB</a>               &lt;= <a  onClick="return qs(event,this,21)"  class=SW href="#478">memBRead</a>;
+					<span class=C>// during the next cycle we'll be reading the next opcode
+</span>					spOffset[4]                      = ~<a  onClick="return qs(event,this,33)"  class=SR href="#205">opcode</a>[4];
+					spOffset[3:0]                    = <a  onClick="return qs(event,this,33)"  class=SR href="#205">opcode</a>[3:0];
+					<a  onClick="return qs(event,this,24)"  class=SR href="#67">idim_flag</a>                       &lt;= 1'b0;
+					<span class=K>case</span> (<a  onClick="return qs(event,this,34)"  class=SR href="#118">decodedOpcode</a>)
+						<a  onClick="return qs(event,this,0)"  class=PA href="#98">Decoded_Im</a> :
+							<span class=K>begin</span>
+								<a  onClick="return qs(event,this,24)"  class=SR href="#67">idim_flag</a> &lt;= 1'b1;
+								<a  onClick="return qs(event,this,14)"  class=SR href="#57">memAWriteEnable</a> &lt;= 1'b1;
+								<span class=K>if</span> (<a  onClick="return qs(event,this,24)"  class=SR href="#67">idim_flag</a> == 1'b0)
+								<span class=K>begin</span>
+									<a  onClick="return qs(event,this,23)"  class=SR href="#66">sp</a> &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> - 1;
+									<a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a> &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> - 1;
+									<span class=K>begin</span> : for_unfold_11
+										<span class=K>integer</span> i;
+										<span class=K>for</span>(i = wordSize - 1; i &gt;= 7; i = i - 1)
+										<span class=K>begin</span>
+											<a  onClick="return qs(event,this,16)"  class=SR href="#185">memAWrite</a>[i] &lt;= <a  onClick="return qs(event,this,33)"  class=SR href="#205">opcode</a>[6];
+										<span class=K>end</span>
+									<span class=K>end</span>
+									<a  onClick="return qs(event,this,16)"  class=SR href="#59">memAWrite</a>[6:0] &lt;= <a  onClick="return qs(event,this,33)"  class=SR href="#205">opcode</a>[6:0];
+								<span class=K>end</span>
+								<span class=K>else</span>
+								<span class=K>begin</span>
+									<a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a> &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a>;
+									<a  onClick="return qs(event,this,16)"  class=SR href="#59">memAWrite</a>[wordSize - 1:7] &lt;= <a  onClick="return qs(event,this,17)"  class=SW href="#474">memARead</a>[wordSize - 8:0];
+									<a  onClick="return qs(event,this,16)"  class=SR href="#59">memAWrite</a>[6:0] &lt;= <a  onClick="return qs(event,this,33)"  class=SR href="#205">opcode</a>[6:0];
+								<span class=K>end</span>
+							<span class=K>end</span>
+						<a  onClick="return qs(event,this,0)"  class=PA href="#101">Decoded_StoreSP</a> :
+							<span class=K>begin</span>
+								<a  onClick="return qs(event,this,18)"  class=SR href="#61">memBWriteEnable</a> &lt;= 1'b1;
+								<a  onClick="return qs(event,this,19)"  class=SR href="#62">memBAddr</a>        &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> + spOffset;
+								<a  onClick="return qs(event,this,20)"  class=SR href="#63">memBWrite</a>       &lt;= <a  onClick="return qs(event,this,17)"  class=SW href="#474">memARead</a>;
+								<a  onClick="return qs(event,this,23)"  class=SR href="#66">sp</a>              &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> + 1;
+								<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a>           &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#94">State_Resync</a>;
+							<span class=K>end</span>
+						<a  onClick="return qs(event,this,0)"  class=PA href="#100">Decoded_LoadSP</a> :
+							<span class=K>begin</span>
+								<a  onClick="return qs(event,this,23)"  class=SR href="#66">sp</a>       &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> - 1;
+								<a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a> &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> + spOffset;
+							<span class=K>end</span>
+						<a  onClick="return qs(event,this,0)"  class=PA href="#103">Decoded_Emulate</a> :
+							<span class=K>begin</span>
+								<a  onClick="return qs(event,this,23)"  class=SR href="#66">sp</a>                      &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> - 1;
+								<a  onClick="return qs(event,this,14)"  class=SR href="#57">memAWriteEnable</a>         &lt;= 1'b1;
+								<a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a>                &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> - 1;
+								<a  onClick="return qs(event,this,16)"  class=SR href="#59">memAWrite</a>               &lt;= 'h0;
+								<a  onClick="return qs(event,this,16)"  class=SR href="#59">memAWrite</a>[maxAddrBit:0] &lt;= <a  onClick="return qs(event,this,22)"  class=SR href="#176">pc</a> + 1;
+								<span class=C>// The emulate address is:
+</span>								<span class=C>// 98 7654 3210
+</span>								<span class=C>// 0000 00aa aaa0 0000
+</span>								<a  onClick="return qs(event,this,22)"  class=SR href="#65">pc</a>                      &lt;= 'h0;
+								<a  onClick="return qs(event,this,22)"  class=SR href="#65">pc</a>[9:5]                 &lt;= <a  onClick="return qs(event,this,33)"  class=SR href="#205">opcode</a>[4:0];
+							<span class=K>end</span>
+						<a  onClick="return qs(event,this,0)"  class=PA href="#102">Decoded_AddSP</a> :
+							<span class=K>begin</span>
+								<a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a> &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a>;
+								<a  onClick="return qs(event,this,19)"  class=SR href="#62">memBAddr</a> &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> + spOffset;
+								<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#91">State_AddSP</a>;
+							<span class=K>end</span>
+						<a  onClick="return qs(event,this,0)"  class=PA href="#104">Decoded_Break</a> :
+							<span class=K>begin</span>
+								<a  onClick="return qs(event,this,12)"  class=SOR href="#53">break</a> &lt;= 1'b1;
+								<span class=ST>$display</span>(<span class=S>&quot;[INFO zpu_core]: Break instruction encountered!&quot;</span>);
+								<span class=C>// $stop;
+</span>								<span class=ST>$finish</span>;
+							<span class=K>end</span>
+						<a  onClick="return qs(event,this,0)"  class=PA href="#105">Decoded_PushSP</a> :
+							<span class=K>begin</span>
+								<a  onClick="return qs(event,this,14)"  class=SR href="#57">memAWriteEnable</a>                  &lt;= 1'b1;
+								<a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a>                         &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> - 1;
+								<a  onClick="return qs(event,this,23)"  class=SR href="#66">sp</a>                               &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> - 1;
+								<a  onClick="return qs(event,this,16)"  class=SR href="#59">memAWrite</a>                        &lt;= 'h0;
+								<a  onClick="return qs(event,this,16)"  class=SR href="#59">memAWrite</a>[maxAddrBit:minAddrBit] &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a>;
+							<span class=K>end</span>
+						<a  onClick="return qs(event,this,0)"  class=PA href="#106">Decoded_PopPC</a> :
+							<span class=K>begin</span>
+								<a  onClick="return qs(event,this,22)"  class=SR href="#65">pc</a> &lt;= <a  onClick="return qs(event,this,17)"  class=SW href="#474">memARead</a>[maxAddrBit:0];
+								<a  onClick="return qs(event,this,23)"  class=SR href="#66">sp</a> &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> + 1;
+								<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#94">State_Resync</a>;
+							<span class=K>end</span>
+						<a  onClick="return qs(event,this,0)"  class=PA href="#107">Decoded_Add</a> :
+							<span class=K>begin</span>
+								<a  onClick="return qs(event,this,23)"  class=SR href="#66">sp</a> &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> + 1;
+								<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#83">State_Add</a>;
+							<span class=K>end</span>
+						<a  onClick="return qs(event,this,0)"  class=PA href="#108">Decoded_Or</a> :
+							<span class=K>begin</span>
+								<a  onClick="return qs(event,this,23)"  class=SR href="#66">sp</a> &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> + 1;
+								<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#84">State_Or</a>;
+							<span class=K>end</span>
+						<a  onClick="return qs(event,this,0)"  class=PA href="#109">Decoded_And</a> :
+							<span class=K>begin</span>
+								<a  onClick="return qs(event,this,23)"  class=SR href="#66">sp</a>    &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> + 1;
+								<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#85">State_And</a>;
+							<span class=K>end</span>
+						<a  onClick="return qs(event,this,0)"  class=PA href="#110">Decoded_Load</a> :
+							<span class=K>begin</span>
+								<span class=K>if</span> ((<a  onClick="return qs(event,this,17)"  class=SW href="#60">memARead</a>[ioBit]) == 1'b1)
+								<span class=K>begin</span>
+									<a  onClick="return qs(event,this,7)"  class=SOR href="#44">out_mem_addr</a>       &lt;= <a  onClick="return qs(event,this,17)"  class=SW href="#474">memARead</a>[maxaddrbitincio:0];
+									<a  onClick="return qs(event,this,9)"  class=SOR href="#48">out_mem_readEnable</a> &lt;= 1'b1;
+									<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a>              &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#87">State_ReadIO</a>;
+								<span class=K>end</span>
+								<span class=K>else</span>
+								<span class=K>begin</span>
+									<a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a> &lt;= <a  onClick="return qs(event,this,17)"  class=SW href="#474">memARead</a>[maxAddrBit:minAddrBit];
+								<span class=K>end</span>
+							<span class=K>end</span>
+						<a  onClick="return qs(event,this,0)"  class=PA href="#111">Decoded_Not</a> :
+							<span class=K>begin</span>
+								<a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a> &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a>[maxAddrBit:minAddrBit];
+								<a  onClick="return qs(event,this,14)"  class=SR href="#57">memAWriteEnable</a> &lt;= 1'b1;
+								<a  onClick="return qs(event,this,16)"  class=SR href="#59">memAWrite</a> &lt;= ~<a  onClick="return qs(event,this,17)"  class=SW href="#474">memARead</a>;
+							<span class=K>end</span>
+						<a  onClick="return qs(event,this,0)"  class=PA href="#112">Decoded_Flip</a> :
+							<span class=K>begin</span>
+								<a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a>        &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a>[maxAddrBit:minAddrBit];
+								<a  onClick="return qs(event,this,14)"  class=SR href="#57">memAWriteEnable</a> &lt;= 1'b1;
+								<span class=K>begin</span> : for_unfold_12
+									<span class=K>integer</span> i;
+									<span class=K>for</span>(i = 0; i &lt;= wordSize - 1; i = i + 1)
+									<span class=K>begin</span>
+										<a  onClick="return qs(event,this,16)"  class=SR href="#185">memAWrite</a>[i] &lt;= <a  onClick="return qs(event,this,17)"  class=SW href="#474">memARead</a>[wordSize - 1 - i];
+									<span class=K>end</span>
+								<span class=K>end</span>
+							<span class=K>end</span>
+						<a  onClick="return qs(event,this,0)"  class=PA href="#113">Decoded_Store</a> :
+							<span class=K>begin</span>
+								<a  onClick="return qs(event,this,19)"  class=SR href="#62">memBAddr</a> &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> + 1;
+								<a  onClick="return qs(event,this,23)"  class=SR href="#66">sp</a>       &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> + 1;
+								<span class=K>if</span> ((<a  onClick="return qs(event,this,17)"  class=SW href="#60">memARead</a>[ioBit]) == 1'b1)
+								<span class=K>begin</span>
+									<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#88">State_WriteIO</a>;
+								<span class=K>end</span>
+								<span class=K>else</span>
+								<span class=K>begin</span>
+									<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#86">State_Store</a>;
+								<span class=K>end</span>
+							<span class=K>end</span>
+						<a  onClick="return qs(event,this,0)"  class=PA href="#114">Decoded_PopSP</a> :
+							<span class=K>begin</span>
+								<a  onClick="return qs(event,this,23)"  class=SR href="#66">sp</a>    &lt;= <a  onClick="return qs(event,this,17)"  class=SW href="#474">memARead</a>[maxAddrBit:minAddrBit];
+								<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#94">State_Resync</a>;
+							<span class=K>end</span>
+						<a  onClick="return qs(event,this,0)"  class=PA href="#97">Decoded_Nop</a> : <a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a> &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a>;
+						<span class=K>default</span> :     <a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a> &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a>;
+					<span class=K>endcase</span>
+				<span class=K>end</span>
+			<a  onClick="return qs(event,this,0)"  class=PA href="#87">State_ReadIO</a> :
+				<span class=K>begin</span>
+					<span class=K>if</span> (<a  onClick="return qs(event,this,4)"  class=SI href="#40">in_mem_busy</a> == 1'b0)
+					<span class=K>begin</span>
+						<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#79">State_Fetch</a>;
+						<a  onClick="return qs(event,this,14)"  class=SR href="#57">memAWriteEnable</a> &lt;= 1'b1;
+						<a  onClick="return qs(event,this,16)"  class=SR href="#59">memAWrite</a> &lt;= <a  onClick="return qs(event,this,5)"  class=SI href="#41">mem_read</a>;
+					<span class=K>end</span>
+				<span class=K>end</span>
+			<a  onClick="return qs(event,this,0)"  class=PA href="#88">State_WriteIO</a> :
+				<span class=K>begin</span>
+					<a  onClick="return qs(event,this,23)"  class=SR href="#66">sp</a>                  &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> + 1;
+					<a  onClick="return qs(event,this,8)"  class=SOR href="#46">out_mem_writeEnable</a> &lt;= 1'b1;
+					<a  onClick="return qs(event,this,7)"  class=SOR href="#44">out_mem_addr</a>        &lt;= <a  onClick="return qs(event,this,17)"  class=SW href="#474">memARead</a>[maxaddrbitincio:0];
+					<a  onClick="return qs(event,this,6)"  class=SOR href="#42">mem_write</a>           &lt;= <a  onClick="return qs(event,this,21)"  class=SW href="#478">memBRead</a>;
+					<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a>               &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#80">State_WriteIODone</a>;
+				<span class=K>end</span>
+			<a  onClick="return qs(event,this,0)"  class=PA href="#80">State_WriteIODone</a> :
+				<span class=K>begin</span>
+					<span class=K>if</span> (<a  onClick="return qs(event,this,4)"  class=SI href="#40">in_mem_busy</a> == 1'b0)
+					<span class=K>begin</span>
+						<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#94">State_Resync</a>;
+					<span class=K>end</span>
+				<span class=K>end</span>
+			<a  onClick="return qs(event,this,0)"  class=PA href="#79">State_Fetch</a> :
+				<span class=K>begin</span>
+					<span class=C>// We need to resync. During the *next* cycle
+</span>					<span class=C>// we'll fetch the opcode @ pc and thus it will
+</span>					<span class=C>// be available for State_Execute the cycle after
+</span>					<span class=C>// next
+</span>					<a  onClick="return qs(event,this,19)"  class=SR href="#62">memBAddr</a> &lt;= <a  onClick="return qs(event,this,22)"  class=SR href="#176">pc</a>[maxAddrBit:minAddrBit];
+					<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a>    &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#90">State_FetchNext</a>;
+				<span class=K>end</span>
+			<a  onClick="return qs(event,this,0)"  class=PA href="#90">State_FetchNext</a> :
+				<span class=K>begin</span>
+					<span class=C>// at this point memARead contains the value that is either
+</span>					<span class=C>// from the top of stack or should be copied to the top of the stack
+</span>					<a  onClick="return qs(event,this,14)"  class=SR href="#57">memAWriteEnable</a> &lt;= 1'b1;
+					<a  onClick="return qs(event,this,16)"  class=SR href="#59">memAWrite</a>       &lt;= <a  onClick="return qs(event,this,17)"  class=SW href="#474">memARead</a>;
+					<a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a>        &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a>;
+					<a  onClick="return qs(event,this,19)"  class=SR href="#62">memBAddr</a>        &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> + 1;
+					<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a>           &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#93">State_Decode</a>;
+				<span class=K>end</span>
+			<a  onClick="return qs(event,this,0)"  class=PA href="#93">State_Decode</a> :
+				<span class=K>begin</span>
+					<span class=C>// during the State_Execute cycle we'll be fetching SP+1
+</span>					<a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a> &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a>;
+					<a  onClick="return qs(event,this,19)"  class=SR href="#62">memBAddr</a> &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> + 1;
+					<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a>    &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#81">State_Execute</a>;
+				<span class=K>end</span>
+			<a  onClick="return qs(event,this,0)"  class=PA href="#86">State_Store</a> :
+				<span class=K>begin</span>
+					<a  onClick="return qs(event,this,23)"  class=SR href="#66">sp</a>              &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a> + 1;
+					<a  onClick="return qs(event,this,14)"  class=SR href="#57">memAWriteEnable</a> &lt;= 1'b1;
+					<a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a>        &lt;= <a  onClick="return qs(event,this,17)"  class=SW href="#474">memARead</a>[maxAddrBit:minAddrBit];
+					<a  onClick="return qs(event,this,16)"  class=SR href="#59">memAWrite</a>       &lt;= <a  onClick="return qs(event,this,21)"  class=SW href="#478">memBRead</a>;
+					<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a>           &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#94">State_Resync</a>;
+				<span class=K>end</span>
+			<a  onClick="return qs(event,this,0)"  class=PA href="#91">State_AddSP</a> :
+				<span class=K>begin</span>
+					<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#83">State_Add</a>;
+				<span class=K>end</span>
+			<a  onClick="return qs(event,this,0)"  class=PA href="#83">State_Add</a> :
+				<span class=K>begin</span>
+					<a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a>        &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a>;
+					<a  onClick="return qs(event,this,14)"  class=SR href="#57">memAWriteEnable</a> &lt;= 1'b1;
+					<a  onClick="return qs(event,this,16)"  class=SR href="#59">memAWrite</a>       &lt;= <a  onClick="return qs(event,this,17)"  class=SW href="#474">memARead</a> + <a  onClick="return qs(event,this,21)"  class=SW href="#478">memBRead</a>;
+					<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a>           &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#79">State_Fetch</a>;
+				<span class=K>end</span>
+			<a  onClick="return qs(event,this,0)"  class=PA href="#84">State_Or</a> :
+				<span class=K>begin</span>
+					<a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a>        &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a>;
+					<a  onClick="return qs(event,this,14)"  class=SR href="#57">memAWriteEnable</a> &lt;= 1'b1;
+					<a  onClick="return qs(event,this,16)"  class=SR href="#59">memAWrite</a>       &lt;= <a  onClick="return qs(event,this,17)"  class=SW href="#474">memARead</a> | <a  onClick="return qs(event,this,21)"  class=SW href="#478">memBRead</a>;
+					<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a>           &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#79">State_Fetch</a>;
+				<span class=K>end</span>
+			<a  onClick="return qs(event,this,0)"  class=PA href="#94">State_Resync</a> :
+				<span class=K>begin</span>
+					<a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a> &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a>;
+					<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a>    &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#79">State_Fetch</a>;
+				<span class=K>end</span>
+			<a  onClick="return qs(event,this,0)"  class=PA href="#85">State_And</a> :
+				<span class=K>begin</span>
+					<a  onClick="return qs(event,this,15)"  class=SR href="#58">memAAddr</a>        &lt;= <a  onClick="return qs(event,this,23)"  class=SR href="#175">sp</a>;
+					<a  onClick="return qs(event,this,14)"  class=SR href="#57">memAWriteEnable</a> &lt;= 1'b1;
+					<a  onClick="return qs(event,this,16)"  class=SR href="#59">memAWrite</a>       &lt;= <a  onClick="return qs(event,this,17)"  class=SW href="#474">memARead</a> &amp; <a  onClick="return qs(event,this,21)"  class=SW href="#478">memBRead</a>;
+					<a  onClick="return qs(event,this,36)"  class=SR href="#122">state</a>           &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#79">State_Fetch</a>;
+				<span class=K>end</span>
+			<span class=K>default</span> :
+					<span class=K>begin</span>
+					<span class=K>end</span>
+		<span class=K>endcase</span>
+	<span class=K>end</span>
+<span class=K>end</span>
+
+<span class=C>// instantiate dual port memory
+</span><a name="zpu_core_memory"></a><a  onClick="return qs(event,this,0)"  class=MM href="dualport_ram.v.html#dualport_ram">dualport_ram</a> memory (
+<a name="470"></a>	<span class=SI>.clk</span>             (<a  onClick="return qs(event,this,1)"  class=SI href="#37">clk</a>),
+<a name="471"></a>	<span class=SI>.memAWriteEnable</span> (<a  onClick="return qs(event,this,14)"  class=SR href="#181">memAWriteEnable</a>),
+<a name="472"></a>	<span class=SI>.memAAddr</span>        (<a  onClick="return qs(event,this,15)"  class=SR href="#179">memAAddr</a>[maxAddrBitBRAM:minAddrBit]),
+<a name="473"></a>	<span class=SI>.memAWrite</span>       (<a  onClick="return qs(event,this,16)"  class=SR href="#185">memAWrite</a>),
+<a name="474"></a>	<a  onClick="return qs(event,this,0)"  class=SOR href="dualport_ram.v.html#72">.memARead</a>        (<a  onClick="return qs(event,this,17)"  class=SW href="#60">memARead</a>),
+<a name="475"></a>	<span class=SI>.memBWriteEnable</span> (<a  onClick="return qs(event,this,18)"  class=SR href="#182">memBWriteEnable</a>),
+<a name="476"></a>	<span class=SI>.memBAddr</span>        (<a  onClick="return qs(event,this,19)"  class=SR href="#180">memBAddr</a>[maxAddrBitBRAM:minAddrBit]),
+<a name="477"></a>	<span class=SI>.memBWrite</span>       (<a  onClick="return qs(event,this,20)"  class=SR href="#186">memBWrite</a>),
+<a name="478"></a>	<a  onClick="return qs(event,this,0)"  class=SOR href="dualport_ram.v.html#88">.memBRead</a>        (<a  onClick="return qs(event,this,21)"  class=SW href="#64">memBRead</a>)
+);
+
+<span class=K>endmodule</span>
+
+</pre>
+<center><table class=NB cols=7 ><tr><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy.html';"><a target="_top" href="hierarchy.html">Hierarchy</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-f.html';"><a target="_top" href="hierarchy-f.html">Files</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-m.html';"><a target="_top" href="hierarchy-m.html">Modules</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-s.html';"><a target="_top" href="hierarchy-s.html">Signals</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-t.html';"><a target="_top" href="hierarchy-t.html">Tasks</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-fn.html';"><a target="_top" href="hierarchy-fn.html">Functions</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='http://www.burbleland.com/v2html/help_7_30.html?';"><a target="_top" href="http://www.burbleland.com/v2html/help_7_30.html?">Help</a></td></tr></table></center>
+<script language="JavaScript"type="text/javascript"><!--
+function next_page() { return ""; }
+function first_page() { return ""; }
+var extra_info = [
+["S","zpu_core.v.html#37","","tb_zpu_core.v.html#185","tb_zpu_core.v.html#93","hierarchy-s.html#clk___zpu_core"],
+["S","zpu_core.v.html#38","","tb_zpu_core.v.html#186","tb_zpu_core.v.html#47","hierarchy-s.html#areset___zpu_core"],
+["S","zpu_core.v.html#39","","tb_zpu_core.v.html#187","tb_zpu_core.v.html#78","hierarchy-s.html#enable___zpu_core"],
+["S","zpu_core.v.html#40","","tb_zpu_core.v.html#188","tb_zpu_core.v.html#55","hierarchy-s.html#in_mem_busy___zpu_core"],
+["S","zpu_core.v.html#41","","tb_zpu_core.v.html#189","tb_zpu_core.v.html#60","hierarchy-s.html#mem_read___zpu_core"],
+["S","zpu_core.v.html#42","zpu_core.v.html#203","","zpu_core.v.html#203","hierarchy-s.html#mem_write___zpu_core"],
+["S","zpu_core.v.html#44","zpu_core.v.html#202","","zpu_core.v.html#202","hierarchy-s.p2.html#out_mem_addr___zpu_core"],
+["S","zpu_core.v.html#46","zpu_core.v.html#183","","zpu_core.v.html#183","hierarchy-s.p2.html#out_mem_writeEnable___zpu_core"],
+["S","zpu_core.v.html#48","zpu_core.v.html#184","","zpu_core.v.html#184","hierarchy-s.p2.html#out_mem_readEnable___zpu_core"],
+["S","zpu_core.v.html#50","zpu_core.v.html#127","","zpu_core.v.html#127","hierarchy-s.html#mem_writeMask___zpu_core"],
+["S","zpu_core.v.html#52","","","zpu_core.v.html#52","hierarchy-s.html#interrupt___zpu_core"],
+["S","zpu_core.v.html#53","zpu_core.v.html#174","","zpu_core.v.html#174","hierarchy-s.html#break___zpu_core"],
+["S","zpu_core.v.html#56","","","","hierarchy-s.p2.html#readIO___zpu_core"],
+["S","zpu_core.v.html#57","zpu_core.v.html#181","","zpu_core.v.html#181","hierarchy-s.html#memAWriteEnable___zpu_core"],
+["S","zpu_core.v.html#58","zpu_core.v.html#179","","zpu_core.v.html#179","hierarchy-s.html#memAAddr___zpu_core"],
+["S","zpu_core.v.html#59","zpu_core.v.html#185","","zpu_core.v.html#185","hierarchy-s.html#memAWrite___zpu_core"],
+["S","zpu_core.v.html#60","zpu_core.v.html#474","","dualport_ram.v.html#72","hierarchy-s.html#memARead___zpu_core"],
+["S","zpu_core.v.html#61","zpu_core.v.html#182","","zpu_core.v.html#182","hierarchy-s.html#memBWriteEnable___zpu_core"],
+["S","zpu_core.v.html#62","zpu_core.v.html#180","","zpu_core.v.html#180","hierarchy-s.html#memBAddr___zpu_core"],
+["S","zpu_core.v.html#63","zpu_core.v.html#186","","zpu_core.v.html#186","hierarchy-s.html#memBWrite___zpu_core"],
+["S","zpu_core.v.html#64","zpu_core.v.html#478","","dualport_ram.v.html#88","hierarchy-s.html#memBRead___zpu_core"],
+["S","zpu_core.v.html#65","zpu_core.v.html#176","","zpu_core.v.html#176","hierarchy-s.p2.html#pc___zpu_core"],
+["S","zpu_core.v.html#66","zpu_core.v.html#175","","zpu_core.v.html#175","hierarchy-s.p2.html#sp___zpu_core"],
+["S","zpu_core.v.html#67","zpu_core.v.html#177","","zpu_core.v.html#177","hierarchy-s.html#idim_flag___zpu_core"],
+["S","zpu_core.v.html#69","","","","hierarchy-s.html#busy___zpu_core"],
+["S","zpu_core.v.html#71","zpu_core.v.html#178","","zpu_core.v.html#178","hierarchy-s.html#begin_inst___zpu_core"],
+["S","zpu_core.v.html#72","zpu_core.v.html#218","","zpu_core.v.html#218","hierarchy-s.p2.html#trace_opcode___zpu_core"],
+["S","zpu_core.v.html#73","zpu_core.v.html#216","","zpu_core.v.html#216","hierarchy-s.p2.html#trace_pc___zpu_core"],
+["S","zpu_core.v.html#74","zpu_core.v.html#219","","zpu_core.v.html#219","hierarchy-s.p2.html#trace_sp___zpu_core"],
+["S","zpu_core.v.html#75","zpu_core.v.html#221","","zpu_core.v.html#221","hierarchy-s.p2.html#trace_topOfStack___zpu_core"],
+["S","zpu_core.v.html#76","zpu_core.v.html#222","","zpu_core.v.html#222","hierarchy-s.p2.html#trace_topOfStackB___zpu_core"],
+["S","zpu_core.v.html#116","zpu_core.v.html#141","","zpu_core.v.html#141","hierarchy-s.p2.html#sampledOpcode___zpu_core"],
+["S","zpu_core.v.html#117","zpu_core.v.html#205","","zpu_core.v.html#205","hierarchy-s.p2.html#opcode___zpu_core"],
+["S","zpu_core.v.html#118","zpu_core.v.html#204","","zpu_core.v.html#204","hierarchy-s.html#decodedOpcode___zpu_core"],
+["S","zpu_core.v.html#119","zpu_core.v.html#142","","zpu_core.v.html#142","hierarchy-s.p2.html#sampledDecodedOpcode___zpu_core"],
+["S","zpu_core.v.html#122","zpu_core.v.html#173","","zpu_core.v.html#173","hierarchy-s.p2.html#state___zpu_core"],
+["S","zpu_core.v.html#125","zpu_core.v.html#128","","zpu_core.v.html#128","hierarchy-s.p2.html#tOpcode_sel___zpu_core"]
+];
+disabled=0;
+// -->
+</script>
+<hr>
+<table>
+ <tr><td><i>This page:</i></td>
+  <td><i>Created:</i></td><td><i>Wed May  7 19:53:07 2008</i></td></tr>
+<tr>
+ <td> </td>
+ <td><i>From:</i></td><td><i>
+../../src/zpu_core.v</i></td></tr>
+</table>
+<hr>
+<table width="100%"><tr><td><i>Verilog converted to html by  <a target="_top" href="http://www.burbleland.com/v2html/v2html.html">  v2html 7.30</a> 
+ (written by <a href="mailto:v2html730@burbleland.com">Costas Calamvokis</a>).</i></td><td align="right"><b><a href="http://www.burbleland.com/v2html/help_7_30.html?">Help</a></b></td></tr></table><table height="90%"><tr><td></td></tr></table>
+</body>
+</html>
